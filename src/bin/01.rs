@@ -1,73 +1,80 @@
 advent_of_code::solution!(1);
 
+#[inline(always)]
+fn parse_int_until_nl_or_eof<I>(it: &mut I) -> i64
+where
+    I: Iterator<Item = u8>,
+{
+    let mut acc: i64 = 0;
+    while let Some(b) = it.next() {
+        if b == b'\n' {
+            break;
+        }
+        acc = acc * 10 + (b - b'0') as i64;
+    }
+    acc
+}
+
 pub fn part_one(input: &str) -> Option<i64> {
-    let s = input.split('\n').filter_map(|line| {
-        let pos = line.chars().nth(0)? == 'R';
-        let number = line[1..].parse::<i64>().ok()?;
+    let mut it = input.bytes();
+    let mut zeros = 0i64;
+    let mut dial = 50i64;
 
-        return Some((pos, number));
-    });
+    while let Some(first) = it.next() {
+        let pos = first == b'R';
+        let number = parse_int_until_nl_or_eof(&mut it);
 
-    let mut dial = 50;
-    let mut count = 0;
-    for (pos, number) in s {
         if pos {
             dial += number;
+            if dial >= 100 {
+                dial %= 100;
+            }
         } else {
             dial -= number;
-        }
-        while dial > 99 {
-            dial -= 100;
-        }
-        while dial < 0 {
-            dial += 100;
+            if dial < 0 {
+                dial = dial.rem_euclid(100);
+            }
         }
         if dial == 0 {
-            count += 1;
+            zeros += 1;
         }
     }
 
-    return Some(count);
+    Some(zeros)
+}
+
+
+#[inline(always)]
+fn count_zero_hits(dial: i64, n: i64, pos: bool) -> i64 {
+    if n <= 0 { return 0; }
+    let mut k0 = if pos {
+        (100 - dial) % 100
+    } else {
+        dial % 100
+    };
+    if k0 == 0 { k0 = 100; }
+    if n < k0 { 0 } else { 1 + (n - k0) / 100 }
 }
 
 pub fn part_two(input: &str) -> Option<i64> {
-    let s = input.split('\n').filter_map(|line| {
-        let pos = line.chars().nth(0)? == 'R';
-        let number = line[1..].parse::<i64>().ok()?;
+    let mut it = input.bytes();
 
-        return Some((pos, number));
-    });
+    let mut dial: i64 = 50;
+    let mut count: i64 = 0;
 
-    let mut dial = 50;
-    let mut count = 0;
-    for (pos, number) in s {
+    while let Some(first) = it.next() {
+        let pos = first == b'R';
+        let n = parse_int_until_nl_or_eof(&mut it);
+        count += count_zero_hits(dial, n, pos);
         if pos {
-            for _ in 0..number {
-                dial += 1;
-                if dial > 99 {
-                    dial = 0;
-                }
-                if dial == 0 {
-                    count += 1;
-                }
-            }
+            dial = (dial + n) % 100;
         } else {
-            for _ in 0..number {
-                dial -= 1;
-                if dial < 0 {
-                    dial = 99;
-                }
-                if dial == 0 {
-                    count += 1;
-                }
-            }
+            dial = (dial - n).rem_euclid(100);
         }
     }
 
-    return Some(count);
+    Some(count)
 }
-
-// too high 5967
 
 #[cfg(test)]
 mod tests {
