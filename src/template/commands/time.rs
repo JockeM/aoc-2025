@@ -2,9 +2,9 @@ use std::collections::HashSet;
 
 use crate::template::run_multi::run_multi;
 use crate::template::timings::Timings;
-use crate::template::{Day, all_days, readme_benchmarks};
+use crate::template::{Day, all_days};
 
-pub fn handle(day: Option<Day>, run_all: bool, store: bool) {
+pub fn handle(day: Option<Day>, run_all: bool) {
     let stored_timings = Timings::read_from_file();
 
     let days_to_run = day.map_or_else(
@@ -21,20 +21,5 @@ pub fn handle(day: Option<Day>, run_all: bool, store: bool) {
         |day| HashSet::from([day]),
     );
 
-    let timings = run_multi(&days_to_run, true, true).unwrap();
-
-    if store {
-        let merged_timings = stored_timings.merge(&timings);
-        merged_timings.store_file().unwrap();
-
-        println!();
-        match readme_benchmarks::update(merged_timings) {
-            Ok(()) => {
-                println!("Stored updated benchmarks.");
-            }
-            Err(_) => {
-                eprintln!("Failed to store updated benchmarks.");
-            }
-        }
-    }
+    run_multi(&days_to_run, true, true).unwrap();
 }
