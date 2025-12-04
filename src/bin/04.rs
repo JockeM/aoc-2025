@@ -6,11 +6,13 @@ pub fn part_one(input: &str) -> Option<u64> {
     let lines = input
         .lines()
         .enumerate()
-        .flat_map(|(y, line)| line.chars().enumerate().map(move |(x, c)| ((y as i32, x as i32), c)))
+        .flat_map(|(y, line)| {
+            line.chars()
+                .enumerate()
+                .map(move |(x, c)| ((y as i32, x as i32), c))
+        })
         .filter(|(_, c)| *c == '@')
         .collect::<HashMap<_, _>>();
-
-    println!("{lines:?}");
 
     let mut count = 0;
     for (y, x) in lines.keys() {
@@ -26,8 +28,7 @@ pub fn part_one(input: &str) -> Option<u64> {
         ];
         let bs = total.iter().filter(|b| **b).count();
 
-        println!("{y} {x} {bs}");
-        if bs <= 4 {
+        if bs <= 3 {
             count += 1;
         }
     }
@@ -36,7 +37,48 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let mut lines = input
+        .lines()
+        .enumerate()
+        .flat_map(|(y, line)| {
+            line.chars()
+                .enumerate()
+                .map(move |(x, c)| ((y as i32, x as i32), c))
+        })
+        .filter(|(_, c)| *c == '@')
+        .collect::<HashMap<_, _>>();
+
+    let mut count = 0;
+    loop {
+        let mut r = vec![];
+        for (y, x) in lines.keys().clone() {
+            let total = vec![
+                lines.get(&(y + 1, x + 1)).is_some(),
+                lines.get(&(y + 1, x - 1)).is_some(),
+                lines.get(&(y + 1, *x)).is_some(),
+                lines.get(&(y - 1, x + 1)).is_some(),
+                lines.get(&(y - 1, x - 1)).is_some(),
+                lines.get(&(y - 1, *x)).is_some(),
+                lines.get(&(*y, x + 1)).is_some(),
+                lines.get(&(*y, x - 1)).is_some(),
+            ];
+            let bs = total.iter().filter(|b| **b).count();
+
+            if bs <= 3 {
+                count += 1;
+                r.push((*y, *x));
+            }
+        }
+        lines = lines
+            .into_iter()
+            .filter(|(k, _)| !r.contains(k))
+            .collect();
+        if r.is_empty() {
+            break;
+        }
+    }
+
+    Some(count)
 }
 
 #[cfg(test)]
