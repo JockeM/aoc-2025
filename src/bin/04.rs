@@ -16,16 +16,14 @@ pub fn part_one(input: &str) -> Option<u64> {
 
     let mut count = 0;
     for (y, x) in lines.keys() {
-        let total = vec![
-            lines.get(&(y + 1, x + 1)).is_some(),
+        let total = [lines.get(&(y + 1, x + 1)).is_some(),
             lines.get(&(y + 1, x - 1)).is_some(),
             lines.get(&(y + 1, *x)).is_some(),
             lines.get(&(y - 1, x + 1)).is_some(),
             lines.get(&(y - 1, x - 1)).is_some(),
             lines.get(&(y - 1, *x)).is_some(),
             lines.get(&(*y, x + 1)).is_some(),
-            lines.get(&(*y, x - 1)).is_some(),
-        ];
+            lines.get(&(*y, x - 1)).is_some()];
         let bs = total.iter().filter(|b| **b).count();
 
         if bs <= 3 {
@@ -52,16 +50,14 @@ pub fn part_two(input: &str) -> Option<u64> {
     loop {
         let mut r = vec![];
         for (y, x) in lines.keys().clone() {
-            let total = vec![
-                lines.get(&(y + 1, x + 1)).is_some(),
+            let total = [lines.get(&(y + 1, x + 1)).is_some(),
                 lines.get(&(y + 1, x - 1)).is_some(),
                 lines.get(&(y + 1, *x)).is_some(),
                 lines.get(&(y - 1, x + 1)).is_some(),
                 lines.get(&(y - 1, x - 1)).is_some(),
                 lines.get(&(y - 1, *x)).is_some(),
                 lines.get(&(*y, x + 1)).is_some(),
-                lines.get(&(*y, x - 1)).is_some(),
-            ];
+                lines.get(&(*y, x - 1)).is_some()];
             let bs = total.iter().filter(|b| **b).count();
 
             if bs <= 3 {
@@ -69,10 +65,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                 r.push((*y, *x));
             }
         }
-        lines = lines
-            .into_iter()
-            .filter(|(k, _)| !r.contains(k))
-            .collect();
+        lines.retain(|k, _| !r.contains(k));
         if r.is_empty() {
             break;
         }

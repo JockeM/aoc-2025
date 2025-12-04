@@ -54,14 +54,13 @@ fn is_invalid(n: u128) -> bool {
     let str = n.to_string();
     let len = str.len();
     for i in 1..len {
-        if len % i == 0 {
-            if str.as_bytes().chunks(i).into_iter().all_equal() {
+        if len.is_multiple_of(i)
+            && str.as_bytes().chunks(i).all_equal() {
                 return true;
             }
-        }
     }
 
-    return false;
+    false
 }
 
 #[cfg(test)]

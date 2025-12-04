@@ -6,7 +6,7 @@ where
     I: Iterator<Item = u8>,
 {
     let mut acc: i64 = 0;
-    while let Some(b) = it.next() {
+    for b in it.by_ref() {
         if b == b'\n' {
             break;
         }
