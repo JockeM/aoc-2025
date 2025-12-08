@@ -1,7 +1,5 @@
 use std::collections::{HashMap, HashSet};
 
-use itertools::Itertools;
-
 advent_of_code::solution!(7);
 
 pub fn part_one(input: &str) -> Option<u64> {
